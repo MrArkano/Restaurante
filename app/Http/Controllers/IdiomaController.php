@@ -10,35 +10,51 @@ class IdiomaController extends Controller
     // READ (Todos)
     public function index()
     {
-        return Idioma::all();
+        return response()->json(Idioma::all());
     }
 
     // READ (Uno)
-    public function show($id)
+    public function show(Idioma $idioma)
     {
-        return Idioma::find($id);
+        return response()->json($idioma);
     }
 
     // CREATE
     public function store(Request $request)
     {
-        Idioma::create($request->only(['nombre', 'codigo']));
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:50',
+            'codigo' => 'required|string|max:5',
+        ]);
 
-        return response()->json(['message' => 'Idioma creado correctamente']);
+        $idioma = Idioma::create($validated);
+
+        return response()->json([
+            'message' => 'Idioma creado correctamente',
+            'data'    => $idioma
+        ], 201);
     }
 
     // UPDATE
-    public function update(Request $request, $id)
+    public function update(Request $request, Idioma $idioma)
     {
-        Idioma::update($id, $request->only(['nombre', 'codigo']));
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:50',
+            'codigo' => 'required|string|max:5',
+        ]);
 
-        return response()->json(['message' => 'Idioma actualizado correctamente']);
+        $idioma->update($validated);
+
+        return response()->json([
+            'message' => 'Idioma actualizado correctamente',
+            'data'    => $idioma
+        ]);
     }
 
     // DELETE
-    public function destroy($id)
+    public function destroy(Idioma $idioma)
     {
-        Idioma::destroy($id);
+        $idioma->delete();
 
         return response()->json(['message' => 'Idioma eliminado correctamente']);
     }
@@ -48,4 +64,4 @@ class IdiomaController extends Controller
         return view('idiomas.create');
     }
 }
-?>
+

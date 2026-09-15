@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8" />
@@ -104,6 +104,12 @@
           <i data-lucide="globe" class="w-4 h-4"></i>
           <span>Nuevo Idioma</span>
         </a>
+
+        <a href="{{ url('/busqueda') }}" 
+           class="px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 {{ request()->is('busqueda') ? 'text-primary bg-primary/10 font-semibold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' }}">
+          <i data-lucide="search" class="w-4 h-4"></i>
+          <span>Buscar</span>
+        </a>
       </nav>
 
       <!-- Botón de acción rápida -->
@@ -137,6 +143,10 @@
       <a href="{{ url('/idiomas/create') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm {{ request()->is('idiomas/create') ? 'text-primary bg-primary/10 font-semibold' : 'text-zinc-300 hover:bg-zinc-800/50' }}">
         <i data-lucide="globe" class="w-4 h-4"></i>
         <span>Nuevo Idioma</span>
+      </a>
+      <a href="{{ url('/busqueda') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm {{ request()->is('busqueda') ? 'text-primary bg-primary/10 font-semibold' : 'text-zinc-300 hover:bg-zinc-800/50' }}">
+        <i data-lucide="search" class="w-4 h-4"></i>
+        <span>Buscar</span>
       </a>
     </div>
   </header>

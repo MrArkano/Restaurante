@@ -2,47 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Idioma // extends Model
+class Idioma extends Model
 {
     protected $table = 'idiomas';
-    public $timestamps = true;
     protected $fillable = ['nombre', 'codigo'];
 
-    public static function all()
+    public function juegos(): HasMany
     {
-        return DB::select('SELECT * FROM idiomas');
+        return $this->hasMany(Juego::class, 'idioma_id');
     }
 
-    public static function find($id)
+    public function expansiones(): HasMany
     {
-        $idiomas = DB::select('SELECT * FROM idiomas WHERE id = ?', [$id]);
-
-        return $idiomas[0] ?? null;
-    }
-
-    public static function create(array $datos)
-    {
-        return DB::insert('INSERT INTO idiomas (nombre, codigo) VALUES (?, ?)', [
-            $datos['nombre'] ?? null,
-            $datos['codigo'] ?? null
-        ]);
-    }
-
-    public static function update($id, array $datos)
-    {
-        return DB::update('UPDATE idiomas SET nombre = ?, codigo = ? WHERE id = ?', [
-            $datos['nombre'] ?? null,
-            $datos['codigo'] ?? null,
-            $id
-        ]);
-    }
-
-    public static function destroy($id)
-    {
-        return DB::delete('DELETE FROM idiomas WHERE id = ?', [$id]);
+        return $this->hasMany(Expansion::class, 'idioma_id');
     }
 }
-?>

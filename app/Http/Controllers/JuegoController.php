@@ -11,20 +11,15 @@ class JuegoController extends Controller
     // READ (Todos con JOIN de Idioma)
     public function index()
     {
-        $juegos = Juego::all();
+        $juegos = Juego::with('idioma')->get();
 
         return view('juegos.index', compact('juegos'));
     }
 
     // READ (Uno)
-    public function show($id)
+    public function show(Juego $juego)
     {
-        $juego = Juego::find($id);
-
-        // Si no existe el juego, devolvemos un 404
-        if (!$juego) {
-            abort(404, 'Juego no encontrado');
-        }
+        $juego->load(['idioma', 'expansiones']);
 
         return view('juegos.show', compact('juego'));
     }
@@ -32,23 +27,41 @@ class JuegoController extends Controller
     // CREATE
     public function store(Request $request)
     {
-        Juego::create($request->only(['titulo', 'anio', 'idioma_id']));
+        $validated = $request->validate([
+            'titulo'    => 'required|string|max:100',
+            'anio'      => 'required|integer|min:1900|max:2099',
+            'idioma_id' => 'required|exists:idiomas,id',
+        ]);
 
-        return response()->json(['message' => 'Juego creado correctamente']);
+        $juego = Juego::create($validated);
+
+        return response()->json([
+            'message' => 'Juego creado correctamente',
+            'data'    => $juego
+        ], 201);
     }
 
     // UPDATE
-    public function update(Request $request, $id)
+    public function update(Request $request, Juego $juego)
     {
-        Juego::update($id, $request->only(['titulo', 'anio', 'idioma_id']));
+        $validated = $request->validate([
+            'titulo'    => 'required|string|max:100',
+            'anio'      => 'required|integer|min:1900|max:2099',
+            'idioma_id' => 'required|exists:idiomas,id',
+        ]);
 
-        return response()->json(['message' => 'Juego actualizado correctamente']);
+        $juego->update($validated);
+
+        return response()->json([
+            'message' => 'Juego actualizado correctamente',
+            'data'    => $juego
+        ]);
     }
 
     // DELETE
-    public function destroy($id)
+    public function destroy(Juego $juego)
     {
-        Juego::destroy($id);
+        $juego->delete();
 
         return response()->json(['message' => 'Juego eliminado correctamente']);
     }
@@ -59,4 +72,3 @@ class JuegoController extends Controller
         return view('juegos.create', compact('idiomas'));
     }
 }
-?>

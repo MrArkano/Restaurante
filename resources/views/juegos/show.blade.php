@@ -1,16 +1,11 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', $juego->titulo . ' — Detalle del Juego')
 
 @section('content')
 @php
-  // Obtenemos las expansiones asociadas a este juego base directamente
-  $expansiones = \Illuminate\Support\Facades\DB::select('
-    SELECT e.id, e.titulo, i.nombre AS idioma
-    FROM expansiones e
-    INNER JOIN idiomas i ON e.idioma_id = i.id
-    WHERE e.juego_id = ?
-  ', [$juego->id]);
+  // Expansiones cargadas desde la relación Eloquent (eager loaded en el controlador)
+  $expansiones = $juego->expansiones->load('idioma');
 @endphp
 
 <div class="max-w-4xl mx-auto space-y-8">
@@ -54,7 +49,7 @@
 
           <span class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/25">
             <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-            Idioma: {{ $juego->idioma }}
+            Idioma: {{ $juego->idioma->nombre ?? $juego->idioma ?? 'Sin idioma' }}
           </span>
 
           <span class="inline-flex items-center gap-1 text-xs font-mono px-2.5 py-1 rounded-full bg-zinc-900 text-zinc-400 border border-zinc-800">
@@ -116,7 +111,7 @@
                 <div class="flex items-center gap-2 text-xs text-zinc-400 mt-0.5">
                   <span class="inline-flex items-center gap-1">
                     <i data-lucide="globe" class="w-3 h-3 text-zinc-500"></i>
-                    {{ $exp->idioma }}
+                    {{ is_object($exp->idioma) ? $exp->idioma->nombre : ($exp->idioma ?? 'N/A') }}
                   </span>
                   <span>&bull;</span>
                   <span class="font-mono text-zinc-500 text-[11px]">ID #{{ $exp->id }}</span>

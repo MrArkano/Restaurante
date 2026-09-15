@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Catálogo de Juegos')
 
@@ -75,7 +75,7 @@
 
               <span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
                 <i data-lucide="globe" class="w-3 h-3"></i>
-                {{ $juego->idioma }}
+                {{ $juego->idioma->nombre ?? $juego->idioma ?? 'Sin idioma' }}
               </span>
             </div>
 

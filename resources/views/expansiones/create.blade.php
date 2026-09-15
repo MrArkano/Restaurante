@@ -1,11 +1,11 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Nueva Expansión')
 
 @section('content')
 @php
   $selectedJuegoId = request()->query('juego_id');
-  $expansiones = \App\Models\Expansion::all();
+  $expansiones = \App\Models\Expansion::with(['juego', 'idioma'])->get();
 @endphp
 
 <div class="max-w-4xl mx-auto space-y-8">
@@ -119,6 +119,27 @@
             <p class="text-[11px] text-zinc-500">Máximo 100 caracteres.</p>
           </div>
 
+          <!-- Año de Publicación -->
+          <div class="space-y-2">
+            <label for="anio" class="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
+              Año de Publicación <span class="text-zinc-500">(Opcional)</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+              </div>
+              <input 
+                type="number" 
+                id="anio" 
+                name="anio"
+                min="1900"
+                max="2099" 
+                placeholder="Ej. 2012" 
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-900/90 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              />
+            </div>
+          </div>
+
           <!-- Idioma de la Expansión -->
           <div class="space-y-2">
             <label for="idioma_id" class="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
@@ -182,11 +203,18 @@
             @forelse($expansiones as $exp)
               <div id="expansion-list-item-{{ $exp->id }}" class="p-3.5 rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-all flex items-center justify-between gap-3">
                 <div>
-                  <h4 class="text-xs font-bold text-white">{{ $exp->titulo }}</h4>
+                  <h4 class="text-xs font-bold text-white flex items-center gap-2">
+                    {{ $exp->titulo }}
+                    @if($exp->anio)
+                      <span class="text-[10px] font-normal px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400">
+                        {{ $exp->anio }}
+                      </span>
+                    @endif
+                  </h4>
                   <div class="flex items-center gap-2 text-[11px] text-zinc-400 mt-1">
-                    <span class="text-primary font-medium truncate max-w-[120px]">{{ $exp->juego_base }}</span>
+                    <span class="text-primary font-medium truncate max-w-[120px]">{{ $exp->juego->titulo ?? 'N/A' }}</span>
                     <span>&bull;</span>
-                    <span class="text-zinc-500">{{ $exp->idioma }}</span>
+                    <span class="text-zinc-500">{{ $exp->idioma->nombre ?? 'N/A' }}</span>
                   </div>
                 </div>
 
@@ -222,10 +250,11 @@
 
     const juego_id = document.getElementById('juego_id').value;
     const titulo = document.getElementById('titulo').value.trim();
+    const anio = document.getElementById('anio').value.trim();
     const idioma_id = document.getElementById('idioma_id').value;
 
     if (!juego_id || !titulo || !idioma_id) {
-      showToast('Por favor completa todos los campos', 'danger');
+      showToast('Por favor completa todos los campos requeridos', 'danger');
       return;
     }
 
@@ -246,6 +275,7 @@
         body: JSON.stringify({
           juego_id: parseInt(juego_id),
           titulo: titulo,
+          anio: anio ? parseInt(anio) : null,
           idioma_id: parseInt(idioma_id)
         })
       });

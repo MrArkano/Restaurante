@@ -9,47 +9,72 @@ use Illuminate\Http\Request;
 
 class ExpansionController extends Controller
 {
-    // READ (Todas con JOIN a Juego e Idioma)
+    // READ (Todas con eager loading)
     public function index()
     {
-        return Expansion::all();
+        $expansiones = Expansion::with(['juego', 'idioma'])->get();
+
+        return response()->json($expansiones);
     }
 
     // READ (Una)
-    public function show($id)
+    public function show(Expansion $expansione)
     {
-        return Expansion::find($id);
+        $expansione->load(['juego', 'idioma']);
+
+        return response()->json($expansione);
     }
 
     // CREATE
     public function store(Request $request)
     {
-        Expansion::create($request->only(['juego_id', 'titulo', 'idioma_id']));
+        $validated = $request->validate([
+            'juego_id'  => 'required|exists:juegos,id',
+            'titulo'    => 'required|string|max:100',
+            'anio'      => 'nullable|integer|min:1900|max:2099',
+            'idioma_id' => 'required|exists:idiomas,id',
+        ]);
 
-        return response()->json(['message' => 'Expansión creada correctamente']);
+        $expansion = Expansion::create($validated);
+
+        return response()->json([
+            'message' => 'Expansión creada correctamente',
+            'data'    => $expansion
+        ], 201);
     }
 
     // UPDATE
-    public function update(Request $request, $id)
+    public function update(Request $request, Expansion $expansione)
     {
-        Expansion::update($id, $request->only(['juego_id', 'titulo', 'idioma_id']));
+        $validated = $request->validate([
+            'juego_id'  => 'required|exists:juegos,id',
+            'titulo'    => 'required|string|max:100',
+            'anio'      => 'nullable|integer|min:1900|max:2099',
+            'idioma_id' => 'required|exists:idiomas,id',
+        ]);
 
-        return response()->json(['message' => 'Expansión actualizada correctamente']);
+        $expansione->update($validated);
+
+        return response()->json([
+            'message' => 'Expansión actualizada correctamente',
+            'data'    => $expansione
+        ]);
     }
 
     // DELETE
-    public function destroy($id)
+    public function destroy(Expansion $expansione)
     {
-        Expansion::destroy($id);
+        $expansione->delete();
 
         return response()->json(['message' => 'Expansión eliminada correctamente']);
     }
 
+    // Formulario de creación
     public function create()
     {
-        $juegos = Juego::all();
-        $idiomas = Idioma::all();
+        $juegos = Juego::orderBy('titulo')->get();
+        $idiomas = Idioma::orderBy('nombre')->get();
+
         return view('expansiones.create', compact('juegos', 'idiomas'));
     }
 }
-?>
