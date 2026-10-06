@@ -1,0 +1,1 @@
+@props(['icon'=>'inbox','title'=>'Sin resultados','message'=>'No hay elementos para mostrar.'])<div class="empty-state text-center py-5"><i class="bi bi-{{ $icon }} empty-icon"></i><h2>{{ $title }}</h2><p>{{ $message }}</p>{{ $slot }}</div>
